@@ -83,18 +83,18 @@ export default {
          }
       },
       async updateAssetsPrices({ getters, commit }) {
-         commit("setRequest", "pending");
          const getPrice = async (name) => await convert({
             coin: [name],
             toCoin: [getters.currency],
          });
          try {
             getters.assets.forEach(async coin => {
-               const price = await getPrice(coin.name);
+               commit("setRequest", "pending");
+               const price = getters.currency === coin.id ? 1 : await getPrice(coin.name);
                if (price) {
                   const findIndex = getters?.assets.findIndex((el) => el?.id === coin.id);
-                  commit("changeCoin", { id: findIndex, price });
                   commit("setRequest", "success");
+                  commit("changeCoin", { id: findIndex, price });
                }
                else {
                   commit("setRequest", false);
@@ -106,7 +106,6 @@ export default {
             commit("setRequest", false);
             console.warn(e)
          }
-
       },
    },
 }

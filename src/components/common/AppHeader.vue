@@ -38,16 +38,8 @@ export default {
 <style lang="scss">
 .header {
   padding: 20px 0 21px;
-  /*   font-size: 14px;
-  line-height: calc(28 / 14); */
   background-color: #2b2b2b;
   border-bottom: 1px solid #f1f1f1;
-
-  /*   @media (min-width: $tabletWidth + "px") {
-    font-size: 18px;
-    line-height: calc(28 / 18);
-  } */
-  // .header__logo
   &__body {
     display: flex;
     align-items: center;
@@ -62,7 +54,6 @@ export default {
       }
     }
   }
-
   // .header__nav
   &__nav {
     flex: 1 1 100%;

@@ -24,7 +24,7 @@ let routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory("demo-task-crypto"),
   routes,
   scrollBehavior() {
     document.getElementById('app').scrollIntoView();
