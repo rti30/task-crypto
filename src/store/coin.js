@@ -11,7 +11,8 @@ export default {
          from: null,
          to: null,
          result: null,
-      }
+         request: "succsess",
+      },
    },
    getters: {
       coins: (state) => state.coins,
@@ -31,21 +32,38 @@ export default {
       },
       setResult(state, result) {
          state.convert.result = result;
+      },
+      setRequest(state, result) {
+         state.convert.request = result;
+      },
+      isClear(state) {
+         state.chart = [];
+         Object.keys(state.convert).forEach(el => state.convert[el] = el === "request" ? "succsess" : null);
       }
    },
    actions: {
       getCoins({ commit }) {
-         const data = getCoins();
-         commit("setCoins", data)
+         try {
+            const data = getCoins();
+            commit("setCoins", data)
+         }
+         catch (e) {
+            console.warn(e);
+         }
       },
       async getChartData({ commit, getters }, { coin, toCoin }) {
-         let { data } = await dataChart({
-            days: getters.days,
-            coin,
-            toCoin
-         });
-         if (data) {
-            commit("setChart", data.prices)
+         try {
+            let { data } = await dataChart({
+               days: getters.days,
+               coin,
+               toCoin
+            });
+            if (data) {
+               commit("setChart", data.prices)
+            }
+         }
+         catch (e) {
+            console.warn(e);
          }
       },
       changeSelect({ commit, getters }, { item, coin }) {
@@ -56,13 +74,29 @@ export default {
       },
       async convert({ commit, getters }) {
          commit("setResult", null);
-         if (getters.convert.to && getters.convert.from) {
-            const result = await convert({
-               coin: [getters.convert.from.name],
-               toCoin: [getters.convert.to.id],
-            });
-            commit("setResult", result);
+         try {
+            commit("setRequest", "pending");
+            if (getters.convert.to && getters.convert.from) {
+               try {
+                  const result = await convert({
+                     coin: [getters.convert.from.name],
+                     toCoin: [getters.convert.to.id],
+                  });
+                  commit("setResult", result);
+               }
+               catch (e) {
+                  console.warn(e);
+               }
+            }
+            commit("setRequest", "succsess");
          }
+         catch (e) {
+            console.warn(e);
+            commit("setRequest", false);
+         }
+      },
+      clearData({ commit }) {
+         commit("isClear");
       }
    },
 }

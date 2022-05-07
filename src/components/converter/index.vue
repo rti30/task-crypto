@@ -9,7 +9,17 @@
         class="converter__convert convert"
       >
         <h2 class="convert__title sub-title">Конвертировать</h2>
-        <label class="convert__title converter__label text">Преоброзовать из</label>
+        <div class="converter__row">
+          <label class="convert__title converter__label text">Преоброзовать из</label>
+          <svg
+            v-if="convertData.result||convertData.request==='pending'"
+            class="sprite-icon sprite-icon--update"
+            :class="{'active': convertData.request==='pending'}"
+            @click="convertTo()"
+          >
+            <use xlink:href="@/assets/img/sprite.svg#icon-update"></use>
+          </svg>
+        </div>
         <CoinSelect
           :options="optionsFrom"
           :selected="convertData.from"
@@ -31,9 +41,29 @@
           v-if="convertData.result"
           class="convert__result text"
         >
-          <label class="convert__title converter__label">Результат: </label>
-          <span class="text--sp">{{convertData.result}} {{convertData.to.id.toUpperCase()}}</span>
+          <div class="converter__row">
+            <div>
+              <label class="convert__title converter__label">Результат: </label>
+              <span class="text--sp">{{convertData.result}} {{convertData.to.id.toUpperCase()}}</span>
+            </div>
+            <svg
+              class="sprite-icon sprite-icon--remove"
+              @click="clearData"
+            >
+              <use xlink:href="@/assets/img/sprite.svg#icon-remove"></use>
+            </svg>
+          </div>
         </div>
+        <label
+          class="convert__title converter__label"
+          v-if="convertData.request==='pending'"
+        >Данные загружаются...
+        </label>
+        <label
+          class="convert__title converter__label"
+          v-if="!convertData.request"
+        >При получении данных произошла ошибка. Попробуйте позже...
+        </label>
       </form>
       <CoinChart />
     </div>
@@ -68,6 +98,7 @@ export default {
       getChartData: "getChartData",
       changeSelect: "changeSelect",
       convertTo: "convert",
+      clearData: "clearData",
     }),
     selected({ item, coin }) {
       this.changeSelect({ item, coin });
@@ -80,48 +111,23 @@ export default {
         });
       }
     },
-    /*     async convertTo() {
-      this.result = await convert({
-        coin: [this.convertData.from.name],
-        toCoin: [this.convertData.to.id],
-      });
-    }, */
   },
 };
 </script>
 <style lang="scss">
 .converter {
   // .converter__title
-  &__title {
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   // .converter__convert
-
   &__convert {
     display: grid;
     //grid-template-columns: 100%;
     gap: 10px 0;
   }
-
-  // .converter__label
-
-  &__label {
-  }
-}
-
-.convert {
-  // .convert__title
-
-  &__title {
-  }
-
-  // .convert__result
-
-  &__result {
-  }
-}
-.sub-title {
-}
-.text {
 }
 </style>

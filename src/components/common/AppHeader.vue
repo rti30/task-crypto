@@ -76,7 +76,7 @@ export default {
   &__menu {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 20px;
+    gap: 10px 20px;
     @media (min-width: $tabletWidth + "px") {
       gap: 0 40px;
     }

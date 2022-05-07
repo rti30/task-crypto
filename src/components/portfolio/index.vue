@@ -5,7 +5,18 @@
         <h1 class="portfolio__title title">
           Портфель
         </h1>
-        <div class="portfolio__total text text-sp">{{total}} &#36; </div>
+        <div class="portfolio__total">
+          <span class="text text--sp">
+            {{total}}&#36;
+          </span>
+          <svg
+            class="sprite-icon sprite-icon--update"
+            :class="{'active' : request==='pending'}"
+            @click="updatePrices()"
+          >
+            <use xlink:href="@/assets/img/sprite.svg#icon-update"></use>
+          </svg>
+        </div>
         <form
           @submit.prevent=""
           class="portfolio__add add-coin"
@@ -18,7 +29,7 @@
              })"
           ></CoinSelect>
           <CoinSum
-            :isValue="sum.value"
+            :isValue="sum.count"
             :labelValue="'Введите значение'"
             @isInput="inputSum($event)"
           ></CoinSum>
@@ -27,13 +38,13 @@
               class="btn"
               type="button"
               :disabled="!canAct"
-              @click="change({op:'increase', coin:selectCoin, value:sum.value})"
+              @click="change({op:'increase', coin:selectCoin, count:sum.count})"
             >Добавить</button>
             <button
               class="btn"
               type="button"
               :disabled="!canAct"
-              @click="change({op:'decrease', coin:selectCoin, value:sum.value})"
+              @click="change({op:'decrease', coin:selectCoin, count:sum.count})"
             >Вычесть</button>
             <button
               class="btn"
@@ -64,34 +75,41 @@ export default {
     return {
       selectCoin: null,
       sum: {
-        value: 1,
+        count: 1,
         require: /[^\d/.]/g,
       },
     };
   },
   computed: {
     ...mapGetters("coin", { coins: "coins" }),
-    ...mapGetters("portfolio", { assets: "assets", total: "total" }),
+    ...mapGetters("portfolio", {
+      assets: "assets",
+      total: "total",
+      request: "request",
+    }),
     canAct() {
-      return this.sum.value && this.selectCoin;
+      return this.sum.count && this.selectCoin;
     },
     hasIn() {
       return this.assets?.some((coin) => coin?.id === this.selectCoin?.id);
     },
   },
   methods: {
-    ...mapActions("portfolio", { change: "changeAssets" }),
+    ...mapActions("portfolio", {
+      change: "changeAssets",
+      updatePrices: "updateAssetsPrices",
+    }),
     changeSelect({ coin }) {
       this.selectCoin = coin;
     },
-    inputSum(value) {
-      value = Number(
-        value
+    inputSum(count) {
+      count = Number(
+        count
           .replace(this.sum.require, "")
           .split(".")
           .reduce((acc, el, i) => (acc += i == 1 ? "." + el : el), "")
       );
-      this.sum.value = value ? value : 0;
+      this.sum.count = count ? count : 0;
     },
   },
 };
@@ -115,14 +133,15 @@ export default {
   }
 
   // .portfolio__total
-
   &__total {
     grid-area: total;
     justify-self: right;
+    display: flex;
+    align-items: center;
+    gap: 0 10px;
   }
 
   // .portfolio__add
-
   &__add {
     grid-area: add-coin;
   }

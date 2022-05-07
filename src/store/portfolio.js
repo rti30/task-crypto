@@ -4,69 +4,109 @@ export default {
    state: {
       assets: [],
       currency: 'usd',
+      request: "succsess",
    },
    getters: {
       assets: state => state.assets,
       currency: state => state.currency,
-      total: state => state.assets.reduce((acc, item) => acc += item.value, 0)
+      total: state => state.assets.reduce((acc, item) => acc += item.price * item.count, 0),
+      request: state => state.request,
    },
    mutations: {
       setAssets(state, data) {
          state.assets = data;
       },
-      changeCoin(state, { id, value }) {
-         state.assets[id].value = value;
+      changeCoin(state, { id, count, price }) {
+         if (count) {
+            state.assets[id].count = count;
+         }
+         if (price) {
+            state.assets[id].price = price;
+         }
       },
       addCoin(state, coin) {
          state.assets.push(coin);
       },
+      setRequest(state, result) {
+         state.request = result;
+      },
    },
 
    actions: {
-      async changeAssets({ getters, commit }, { op, coin, value }) {
-         if (!op || !coin) {
-            return;
-         }
-         const id = coin?.id;
-         const remove = () => {
-            const data = getters.assets?.filter(item => item.id !== id);
-            commit("setAssets", data);
-         }
-         if (op === "remove") {
-            remove();
-         }
-         else if (!isNaN(value)) {
-            value = getters.currency === coin.id ? value
-               :
-               await convert({
-                  coin: [coin.name],
-                  toCoin: [getters.currency],
-               });
-            const findIndex = getters?.assets.findIndex((coin) => coin?.id === id);
-            const oldValue = findIndex !== -1 ? getters.assets[findIndex].value : 0;
-            let newValue = 0;
-            if (op === "increase") {
-               newValue = oldValue + value;
+      async changeAssets({ getters, commit }, { op, coin, count }) {
+         try {
+            if (!op || !coin) {
+               return;
             }
-            else if (op === "decrease") {
-               newValue = oldValue - value;
-               if (newValue <= 0 && findIndex == -1) {
-                  return
+            const id = coin?.id;
+            const remove = () => {
+               const data = getters.assets?.filter(item => item.id !== id);
+               commit("setAssets", data);
+            }
+            if (op === "remove") {
+               remove();
+            }
+            else if (!isNaN(count)) {
+               const price = getters.currency === coin.id ? 1
+                  :
+                  await convert({
+                     coin: [coin.name],
+                     toCoin: [getters.currency],
+                  }) * count;
+               const findIndex = getters?.assets.findIndex((coin) => coin?.id === id);
+               const oldCount = findIndex !== -1 ? getters.assets[findIndex].count : 0;
+               let newCount = 0;
+               if (op === "increase") {
+                  newCount = oldCount + count;
+               }
+               else if (op === "decrease") {
+                  newCount = oldCount - count;
+                  if (findIndex == -1) {
+                     return
+                  }
+               }
+               if (findIndex !== -1) {
+                  if (newCount <= 0) {
+                     remove();
+                     return;
+                  }
+                  commit("changeCoin", { id: findIndex, count: newCount, price });
+               }
+               else {
+                  const newCoint = { ...coin, count, price }
+                  commit("addCoin", newCoint);
                }
             }
-            if (findIndex !== -1) {
-               if (newValue <= 0) {
-                  remove();
-                  return;
+         }
+         catch (e) {
+            console.warn(e);
+         }
+      },
+      async updateAssetsPrices({ getters, commit }) {
+         commit("setRequest", "pending");
+         const getPrice = async (name) => await convert({
+            coin: [name],
+            toCoin: [getters.currency],
+         });
+         try {
+            getters.assets.forEach(async coin => {
+               const price = await getPrice(coin.name);
+               if (price) {
+                  const findIndex = getters?.assets.findIndex((el) => el?.id === coin.id);
+                  commit("changeCoin", { id: findIndex, price });
+                  commit("setRequest", "success");
                }
-               commit("changeCoin", { id: findIndex, value: newValue });
-            }
-            else {
-               const newCoint = { ...coin, value }
-               commit("addCoin", newCoint);
-            }
+               else {
+                  commit("setRequest", false);
+                  throw new Error("Ошибка обновления стоимости валюты")
+               }
+            })
+         }
+         catch (e) {
+            commit("setRequest", false);
+            console.warn(e)
          }
 
-      }
+      },
    },
 }

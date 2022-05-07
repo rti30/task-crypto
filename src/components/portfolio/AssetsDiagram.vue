@@ -5,7 +5,6 @@
       name="fade"
       mode="ease-in"
     >
-
       <DoughnutChart
         :chartData="diagramData"
         v-if="diagramData?.datasets[0].data.length"
@@ -37,7 +36,7 @@ export default {
     },
     coinValues() {
       return this.assets.map((coin) => {
-        return coin.value;
+        return coin.price * coin.count;
       });
     },
     coinsBackground() {
