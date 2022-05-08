@@ -34,6 +34,9 @@ export default {
 
    actions: {
       async changeAssets({ getters, commit }, { op, coin, count }) {
+         if (getters.request === "pending") {
+            return
+         }
          try {
             if (!op || !coin) {
                return;
@@ -83,6 +86,9 @@ export default {
          }
       },
       async updateAssetsPrices({ getters, commit }) {
+         if (getters.request === "pending") {
+            return
+         }
          const getPrice = async (name) => await convert({
             coin: [name],
             toCoin: [getters.currency],

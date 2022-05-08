@@ -12,9 +12,9 @@
         <div class="converter__row">
           <label class="convert__title converter__label text">Преоброзовать из</label>
           <svg
-            v-if="convertData.result||convertData.request==='pending'"
+            v-if="convertData.result||requests.convert==='pending'"
             class="sprite-icon sprite-icon--update"
-            :class="{'active': convertData.request==='pending'}"
+            :class="{'active': requests.convert==='pending'}"
             @click="convertTo()"
           >
             <use xlink:href="@/assets/img/sprite.svg#icon-update"></use>
@@ -56,12 +56,12 @@
         </div>
         <label
           class="convert__title converter__label"
-          v-if="convertData.request==='pending'"
+          v-if="requests.convert==='pending'"
         >Данные загружаются...
         </label>
         <label
           class="convert__title converter__label"
-          v-if="!convertData.request"
+          v-if="!requests.convert"
         >При получении данных произошла ошибка. Попробуйте позже...
         </label>
       </form>
@@ -81,7 +81,11 @@ export default {
     CoinChart,
   },
   computed: {
-    ...mapGetters("coin", { coins: "coins", convertData: "convert" }),
+    ...mapGetters("coin", {
+      coins: "coins",
+      convertData: "convert",
+      requests: "requests",
+    }),
     optionsFrom() {
       return this.convertData.to
         ? this.coins.filter((coin) => coin.id !== this.convertData.to.id)
