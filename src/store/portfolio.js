@@ -55,7 +55,7 @@ export default {
                   await convert({
                      coin: [coin.name],
                      toCoin: [getters.currency],
-                  }) * count;
+                  });
                const findIndex = getters?.assets.findIndex((coin) => coin?.id === id);
                const oldCount = findIndex !== -1 ? getters.assets[findIndex].count : 0;
                let newCount = 0;
