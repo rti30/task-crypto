@@ -5,7 +5,11 @@
       v-if="convert.result"
     >
       <h2 class="converter-chart__title sub-title"> График курса. Колличесво дней: {{days}}</h2>
-      <LineChart :chartData="chartData" />
+      <LineChart
+        :chartData="chartData"
+        @pointerover="pointRadius=2"
+        @pointerout="pointRadius=0"
+      />
     </div>
   </transition>
 </template>
@@ -22,6 +26,7 @@ export default {
   data() {
     return {
       showChart: false,
+      pointRadius: 0,
     };
   },
   computed: {
@@ -43,7 +48,7 @@ export default {
             borderColor:
               "#" +
               (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6),
-            pointRadius: 0,
+            pointRadius: this.pointRadius,
           },
         ],
       };

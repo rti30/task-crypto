@@ -24,7 +24,7 @@ let routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(""),
   routes,
   scrollBehavior() {
     document.getElementById('app').scrollIntoView();
