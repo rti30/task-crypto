@@ -7,8 +7,9 @@
       <h2 class="converter-chart__title sub-title"> График курса. Колличесво дней: {{days}}</h2>
       <LineChart
         :chartData="chartData"
-        @pointerover="pointRadius=2"
-        @pointerout="pointRadius=0"
+        @mouseover="pointRadius=2.5"
+        @mouseout="pointRadius=0"
+        @touchstart="pointRadius=pointRadius===0 ? 2.5 : 0"
       />
     </div>
   </transition>
