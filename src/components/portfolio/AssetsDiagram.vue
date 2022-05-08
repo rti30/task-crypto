@@ -28,10 +28,14 @@ export default {
     DoughnutChart,
   },
   computed: {
-    ...mapGetters("portfolio", { assets: "assets" }),
+    ...mapGetters("portfolio", { assets: "assets", total: "total" }),
     coinNames() {
-      return this.assets.map((coin) => {
-        return coin.name.toUpperCase();
+      return this.assets.map(({ name, price, count }) => {
+        return `${name.toUpperCase()} (${count} ед: ${(
+          (price / this.total) *
+          count *
+          100
+        ).toFixed(2)}%)`;
       });
     },
     coinValues() {
