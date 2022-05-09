@@ -1,69 +1,79 @@
 <template>
   <section class="converter">
     <div class="content-width">
-      <h1 class="converter__title title">
-        Конвертер валют
-      </h1>
-      <form
-        @submit.prevent=""
-        class="converter__convert convert"
-      >
+      <h1 class="converter__title title">Конвертер валют</h1>
+      <form @submit.prevent="" class="converter__convert convert">
         <h2 class="convert__title sub-title">Конвертировать</h2>
         <div class="converter__row">
-          <label class="convert__title converter__label text">Преоброзовать из</label>
+          <label class="convert__title converter__label convert-to__label text"
+            >Преобразовать из</label
+          >
           <svg
-            v-if="convertData.result||requests.convert==='pending'"
-            class="sprite-icon sprite-icon--update"
-            :class="{'active': requests.convert==='pending'}"
-            @click="convertTo()"
+            v-if="convertData.to && convertData.from && convertData.count"
+            class="sprite-icon sprite-icon--update conver-to__update"
+            :class="{ active: request === 'pending' }"
+            @click="updateAll()"
           >
             <use xlink:href="@/assets/img/sprite.svg#icon-update"></use>
           </svg>
         </div>
-        <CoinSelect
-          :options="optionsFrom"
-          :selected="convertData.from"
-          @select="selected({
-           item:'from',
-           coin:$event
-          })"
-        ></CoinSelect>
-        <label class="convert__title converter__label text">Преоброзовать в</label>
+        <div class="convert-to">
+          <CoinCount
+            class="convert-to__count"
+            :isValue="convertData.count"
+            :labelValue="'Введите число'"
+            @isInput="
+              selected({
+                count: $event,
+              })
+            "
+          ></CoinCount>
+          <CoinSelect
+            class="convert-to__from"
+            :options="optionsFrom"
+            :selected="convertData.from"
+            @select="
+              selected({
+                item: 'from',
+                coin: $event,
+              })
+            "
+          ></CoinSelect>
+        </div>
+
+        <label class="convert__title converter__label text"
+          >Преобразовать в</label
+        >
         <CoinSelect
           :options="optionsTo"
           :selected="convertData.to"
-          @select="selected({
-           item:'to',
-           coin:$event
-          })"
+          @select="
+            selected({
+              item: 'to',
+              coin: $event,
+            })
+          "
         ></CoinSelect>
-        <div
-          v-if="convertData.result"
-          class="convert__result text"
-        >
+        <div v-if="result" class="convert__result text">
           <div class="converter__row">
             <div>
               <label class="convert__title converter__label">Результат: </label>
-              <span class="text--sp">{{convertData.result}} {{convertData.to.id.toUpperCase()}}</span>
+              <span class="text--sp"
+                >{{ result }} {{ convertData.to.id.toUpperCase() }}</span
+              >
+              <span class="text">
+                &nbsp; (по курсу: {{ convertData.price }} за ед.)</span
+              >
             </div>
-            <svg
-              class="sprite-icon sprite-icon--remove"
-              @click="clearData"
-            >
+            <svg class="sprite-icon sprite-icon--remove" @click="clearData">
               <use xlink:href="@/assets/img/sprite.svg#icon-remove"></use>
             </svg>
           </div>
         </div>
-        <label
-          class="convert__title converter__label"
-          v-if="requests.convert==='pending'"
-        >Данные загружаются...
-        </label>
-        <label
-          class="convert__title converter__label"
-          v-if="!requests.convert"
-        >При получении данных произошла ошибка. Попробуйте позже...
-        </label>
+        <p class="text" v-if="request === 'pending'">Данные загружаются...</p>
+        <p class="text" v-if="!request">
+          При получении данных произошла ошибка. Попробуйте позже...
+        </p>
       </form>
       <CoinChart />
     </div>
@@ -72,6 +82,7 @@
 <script>
 import CoinSelect from "@/components/ui/ui-select.vue";
 import CoinChart from "@/components/converter/ConverterChart.vue";
+import CoinCount from "@/components/ui/ui-input.vue";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -79,12 +90,14 @@ export default {
   components: {
     CoinSelect,
     CoinChart,
+    CoinCount,
   },
   computed: {
     ...mapGetters("coin", {
       coins: "coins",
       convertData: "convert",
-      requests: "requests",
+      request: "request",
+      result: "result",
     }),
     optionsFrom() {
       return this.convertData.to
@@ -99,14 +112,16 @@ export default {
   },
   methods: {
     ...mapActions("coin", {
-      getChartData: "getChartData",
       changeSelect: "changeSelect",
       convertTo: "convert",
-      clearData: "clearData",
+      clearConvert: "clearData",
     }),
-    selected({ item, coin }) {
-      this.changeSelect({ item, coin });
-
+    ...mapActions("chartData", {
+      getChartData: "getChartData",
+      clearChart: "clearData",
+    }),
+    selected({ item, coin, count }) {
+      this.changeSelect({ item, coin, count });
       if (this.convertData.to && this.convertData.from) {
         this.convertTo();
         this.getChartData({
@@ -115,12 +130,22 @@ export default {
         });
       }
     },
+    updateAll() {
+      this.convertTo();
+      this.getChartData({
+        coin: this.convertData.from.name,
+        toCoin: this.convertData.to.id,
+      });
+    },
+    clearData() {
+      this.clearConvert();
+      this.clearChart();
+    },
   },
 };
 </script>
 <style lang="scss">
 .converter {
-  // .converter__title
   &__row {
     display: flex;
     justify-content: space-between;
@@ -132,6 +157,17 @@ export default {
     display: grid;
     //grid-template-columns: 100%;
     gap: 10px 0;
+  }
+}
+
+.convert-to {
+  display: flex;
+  gap: 0 10px;
+  &__count {
+    flex: 0 0 30%;
+  }
+  &__from {
+    flex: 1 1 auto;
   }
 }
 </style>

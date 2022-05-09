@@ -1,54 +1,40 @@
 
 import getCoins from "@/apiCoin/getCoins"
 import convert from "@/apiCoin/convert";
-import dataChart from "@/apiCoin/chart";
 export default {
    namespaced: true,
    state: {
       coins: {},
-      // TODO, это можно перенести в отельный state
-      chart: [],
       convert: {
          from: null,
          to: null,
-         result: null,
+         count: 1,
+         price: null,
       },
-      // TODO, это можно перенести в отельный state
-      requests: {
-         chartHistory: "succsess",
-         convert: "succsess",
-      },
+      request: "succsess",
    },
    getters: {
       coins: (state) => state.coins,
-      chart: (state) => state.chart,
-      days: () => "14",
       convert: (state) => state.convert,
-      requests: state => state.requests,
+      request: state => state.request,
+      result: ({ convert }) => convert.price ? convert.price * convert.count : null
    },
    mutations: {
       setCoins(state, data) {
          if (data) { state.coins = data }
       },
-      // TODO, это можно перенести в отельный state
-      setChart(state, data) {
-         if (data) { state.chart = data }
+      setForConvert(state, { item, value }) {
+         state.convert[item] = value;
       },
-      setForConvert(state, { item, coin }) {
-         state.convert[item] = coin;
+      setPrice(state, result) {
+         state.convert.price = result;
       },
-      setResult(state, result) {
-         state.convert.result = result;
-      },
-      // TODO, это можно перенести в отельный state
-      setRequest(state, { name, result }) {
-         state.requests[name] = result;
+      setRequest(state, result) {
+         state.request = result;
 
       },
-      // TODO, это можно перенести в отельный state
       isClear(state) {
-         state.chart = [];
-         Object.keys(state.convert).forEach(el => state.convert[el] = el === "request" ? "succsess" : null);
+         Object.keys(state.convert).forEach(el => state.convert[el] = el === "count" ? 1 : null);
       }
    },
    actions: {
@@ -62,61 +48,44 @@ export default {
             console.warn(e);
          }
       },
-      // TODO, это можно перенести в отельный state
-      async getChartData({ commit, getters }, { coin, toCoin }) {
-         if (getters.requests.chartHistory === "pending") {
-            return;
+      changeSelect({ commit, getters }, { item, coin, count }) {
+         const hasInCoin = () => getters.coins?.some(item => item.id === coin.id);
+         if (item && hasInCoin()) {
+            commit("setForConvert", { item, value: coin });
          }
-         try {
-            commit("setRequest", { result: "pending", name: "convert" });
-            let { data } = await dataChart({
-               days: getters.days,
-               coin,
-               toCoin
-            });
-            if (data) {
-               commit("setChart", data.prices)
-            }
-            commit("setRequest", { name: "convert", result: "succsess" });
-         }
-         catch (e) {
-            console.warn(e);
-            commit("setRequest", { name: "convert", result: false });
-         }
-      },
-      changeSelect({ commit, getters }, { item, coin }) {
-         const hasInCoins = () => getters.coins?.some(item => item.id === coin.id);
-         if (item && coin && hasInCoins()) {
-            commit("setForConvert", { item, coin });
+         if (!isNaN(count)) {
+            commit("setForConvert", { item: "count", value: count });
          }
       },
       async convert({ commit, getters }) {
-         if (getters.requests.convert === "pending") {
+         if (getters.request === "pending") {
             return
          }
-         commit("setResult", null);
+         commit("setPrice", null);
+         commit("setRequest", "pending");
          try {
-            commit("setRequest", { result: "pending", name: "convert" });
-            if (getters.convert.to && getters.convert.from) {
+            if (getters.convert.to && getters.convert.from && !isNaN(getters.convert.count)) {
                try {
-                  const result = await convert({
+                  const result = (await convert({
                      coin: [getters.convert.from.name],
                      toCoin: [getters.convert.to.id],
-                  });
-                  commit("setResult", result);
+                  }));
+                  commit("setRequest", "succsess");
+                  if (result) {
+                     commit("setPrice", result);
+                  }
                }
                catch (e) {
+                  commit("setRequest", false);
                   console.warn(e);
                }
             }
-            commit("setRequest", { name: "convert", result: "succsess" });
          }
          catch (e) {
+            commit("setRequest", false);
             console.warn(e);
-            commit("setRequest", { name: "convert", result: false });
          }
       },
-      // TODO, это можно перенести в отельный state
       clearData({ commit }) {
          commit("isClear");
       }

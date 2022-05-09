@@ -1,21 +1,16 @@
 <template>
   <div class="diagram">
-    <h2 class="sub-title sub-title--center">Диаграмма распределения финансов</h2>
-    <transition-group
-      name="fade"
-      mode="ease-in"
-    >
+    <h2 class="sub-title sub-title--center">
+      Диаграмма распределения финансов
+    </h2>
+    <transition-group name="fade" mode="ease-in">
       <DoughnutChart
         :chartData="diagramData"
         v-if="diagramData?.datasets[0].data.length"
       />
-      <div
-        v-else
-        class="text text-sp"
-      >В портфеле пока нет финансов</div>
+      <p v-else class="text text-sp">В портфеле пока нет финансов</p>
     </transition-group>
   </div>
-
 </template>
 <script>
 import { DoughnutChart } from "vue-chart-3";

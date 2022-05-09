@@ -2,57 +2,65 @@
   <section class="portfolio">
     <div class="content-width">
       <div class="portfolio__body">
-        <h1 class="portfolio__title title">
-          Портфель
-        </h1>
+        <h1 class="portfolio__title title">Портфель</h1>
         <div class="portfolio__total">
-          <span class="text text--sp">
-            {{total}}&#36;
-          </span>
+          <span class="text text--sp"> {{ total }}&#36; </span>
           <svg
             class="sprite-icon sprite-icon--update"
-            :class="{'active' : request==='pending'}"
+            :class="{ active: request === 'pending' }"
             @click="updatePrices()"
           >
             <use xlink:href="@/assets/img/sprite.svg#icon-update"></use>
           </svg>
         </div>
-        <form
-          @submit.prevent=""
-          class="portfolio__add add-coin"
-        >
+        <form @submit.prevent="" class="portfolio__add add-coin">
           <CoinSelect
             :options="coins"
             :selected="selectCoin"
-            @select="changeSelect({
-              coin:$event
-             })"
+            @select="
+              changeSelect({
+                coin: $event,
+              })
+            "
           ></CoinSelect>
-          <CoinSum
+          <CoinCount
             :isValue="sum.count"
-            :labelValue="'Введите значение'"
+            :labelValue="'Введите число'"
             @isInput="inputSum($event)"
-          ></CoinSum>
+          ></CoinCount>
           <div class="add-coin__controler">
             <button
               class="btn"
               type="button"
               :disabled="!canAct"
-              @click="change({op:'increase', coin:selectCoin, count:sum.count})"
-            >Добавить</button>
+              @click="
+                change({ op: 'increase', coin: selectCoin, count: sum.count })
+              "
+            >
+              Добавить
+            </button>
             <button
               class="btn"
               type="button"
               :disabled="!canAct"
-              @click="change({op:'decrease', coin:selectCoin, count:sum.count})"
-            >Вычесть</button>
+              @click="
+                change({ op: 'decrease', coin: selectCoin, count: sum.count })
+              "
+            >
+              Вычесть
+            </button>
             <button
               class="btn"
               type="button"
-              :disabled="!hasIn"
-              @click="change({op:'remove', coin:selectCoin})"
-            >Удалить</button>
+              :disabled="!hasIn || !canAct"
+              @click="change({ op: 'remove', coin: selectCoin })"
+            >
+              Удалить
+            </button>
           </div>
+          <p class="text" v-if="!request">
+            При выполнении операции произошла ошибка. Попробуйте позже...
+          </p>
         </form>
       </div>
       <CoinsDiagram />
@@ -61,14 +69,14 @@
 </template>
 <script>
 import CoinSelect from "@/components/ui/ui-select.vue";
-import CoinSum from "@/components/ui/ui-input.vue";
+import CoinCount from "@/components/ui/ui-input.vue";
 import CoinsDiagram from "@/components/portfolio/AssetsDiagram.vue";
 import { mapActions, mapGetters } from "vuex";
 export default {
   name: "AssetsIndex",
   components: {
     CoinSelect,
-    CoinSum,
+    CoinCount,
     CoinsDiagram,
   },
   data() {
@@ -88,7 +96,7 @@ export default {
       request: "request",
     }),
     canAct() {
-      return this.sum.count && this.selectCoin;
+      return this.sum.count && this.selectCoin && this.request !== "pending";
     },
     hasIn() {
       return this.assets?.some((coin) => coin?.id === this.selectCoin?.id);
@@ -150,7 +158,7 @@ export default {
 .add-coin {
   display: grid;
   gap: 25px 0;
-  grid-template-areas: "";
+
   // .add-coin__controler
   &__controler {
     justify-content: center;

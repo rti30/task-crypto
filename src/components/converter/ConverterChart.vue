@@ -1,15 +1,18 @@
 <template>
+  <p class="text" v-if="request === 'pending'">График загружается...</p>
+  <p class="text" v-if="!request">
+    При загрузке данных графика произошла ошибка. Попробуйте позже...
+  </p>
   <transition name="fade">
-    <div
-      class="converter__chart converter-chart"
-      v-if="convert.result"
-    >
-      <h2 class="converter-chart__title sub-title"> График курса. Колличесво дней: {{days}}</h2>
+    <div class="converter__chart converter-chart" v-if="dataChart?.length">
+      <h2 class="converter-chart__title sub-title">
+        График курса. Колличесво дней: {{ days }}
+      </h2>
       <LineChart
         :chartData="chartData"
-        @mouseover="pointRadius=2.5"
-        @mouseout="pointRadius=0"
-        @touchstart="pointRadius=pointRadius===0 ? 2.5 : 0"
+        @mouseover="pointRadius = 2.5"
+        @mouseout="pointRadius = 0"
+        @touchstart="pointRadius = pointRadius === 0 ? 2.5 : 0"
       />
     </div>
   </transition>
@@ -32,16 +35,20 @@ export default {
   },
   computed: {
     ...mapGetters("coin", {
+      convert: "convert",
+    }),
+    ...mapGetters("chartData", {
       dataChart: "chart",
       days: "days",
-      convert: "convert",
+      converted: "convert",
+      request: "request",
     }),
     chartData() {
       return {
         labels: this.dataTime.times,
         datasets: [
           {
-            label: "График курса",
+            label: `${this.converted.from.toUpperCase()} / ${this.converted.to.toUpperCase()}`,
             data: this.dataTime.values,
             backgroundColor:
               "#" +
