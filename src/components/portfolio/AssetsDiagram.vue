@@ -3,12 +3,18 @@
     <h2 class="sub-title sub-title--center">
       Диаграмма распределения финансов
     </h2>
-    <transition-group name="fade" mode="ease-in">
+    <transition-group
+      name="fade"
+      mode="ease-in"
+    >
       <DoughnutChart
         :chartData="diagramData"
         v-if="diagramData?.datasets[0].data.length"
       />
-      <p v-else class="text text-sp">В портфеле пока нет финансов</p>
+      <p
+        v-else
+        class="text text-sp"
+      >В портфеле пока нет финансов</p>
     </transition-group>
   </div>
 </template>

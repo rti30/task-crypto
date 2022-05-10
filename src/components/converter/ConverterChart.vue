@@ -1,10 +1,19 @@
 <template>
-  <p class="text" v-if="request === 'pending'">График загружается...</p>
-  <p class="text" v-if="!request">
+  <p
+    class="text"
+    v-if="request === 'pending'"
+  >График загружается...</p>
+  <p
+    class="text"
+    v-if="!request"
+  >
     При загрузке данных графика произошла ошибка. Попробуйте позже...
   </p>
   <transition name="fade">
-    <div class="converter__chart converter-chart" v-if="dataChart?.length">
+    <div
+      class="converter__chart converter-chart"
+      v-if="dataChart?.length"
+    >
       <h2 class="converter-chart__title sub-title">
         График курса. Колличесво дней: {{ days }}
       </h2>
@@ -12,7 +21,7 @@
         :chartData="chartData"
         @mouseover="pointRadius = 2.5"
         @mouseout="pointRadius = 0"
-        @touchstart="pointRadius = pointRadius === 0 ? 2.5 : 0"
+        @touchend="pointRadius = pointRadius === 0 ? 2.5 : 0"
       />
     </div>
   </transition>

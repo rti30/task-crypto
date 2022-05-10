@@ -4,7 +4,7 @@
       <div class="portfolio__body">
         <h1 class="portfolio__title title">Портфель</h1>
         <div class="portfolio__total">
-          <span class="text text--sp"> {{ total }}&#36; </span>
+          <span class="text text--sp"> {{ totalRound }}&#36; </span>
           <svg
             class="sprite-icon sprite-icon--update"
             :class="{ active: request === 'pending' }"
@@ -13,7 +13,10 @@
             <use xlink:href="@/assets/img/sprite.svg#icon-update"></use>
           </svg>
         </div>
-        <form @submit.prevent="" class="portfolio__add add-coin">
+        <form
+          @submit.prevent=""
+          class="portfolio__add add-coin"
+        >
           <CoinSelect
             :options="coins"
             :selected="selectCoin"
@@ -24,9 +27,10 @@
             "
           ></CoinSelect>
           <CoinCount
-            :isValue="sum.count"
+            :isValue="count"
             :labelValue="'Введите число'"
-            @isInput="inputSum($event)"
+            :mode="'double'"
+            @isInput="count = $event ? $event : 0"
           ></CoinCount>
           <div class="add-coin__controler">
             <button
@@ -34,7 +38,7 @@
               type="button"
               :disabled="!canAct"
               @click="
-                change({ op: 'increase', coin: selectCoin, count: sum.count })
+                change({ op: 'increase', coin: selectCoin, count })
               "
             >
               Добавить
@@ -44,7 +48,7 @@
               type="button"
               :disabled="!canAct"
               @click="
-                change({ op: 'decrease', coin: selectCoin, count: sum.count })
+                change({ op: 'decrease', coin: selectCoin,count })
               "
             >
               Вычесть
@@ -58,7 +62,10 @@
               Удалить
             </button>
           </div>
-          <p class="text" v-if="!request">
+          <p
+            class="text"
+            v-if="!request"
+          >
             При выполнении операции произошла ошибка. Попробуйте позже...
           </p>
         </form>
@@ -82,10 +89,11 @@ export default {
   data() {
     return {
       selectCoin: null,
-      sum: {
+      count: 1,
+      /*       sum: {
         count: 1,
-        require: /[^\d/.]/g,
-      },
+         require: /[^\d/.]/g, 
+      }, */
     };
   },
   computed: {
@@ -95,8 +103,14 @@ export default {
       total: "total",
       request: "request",
     }),
+    totalRound() {
+      const hasfraction = this.total.toString().split(".").length > 1;
+      return hasfraction
+        ? Math.floor(this.total * 100000) / 100000
+        : this.total;
+    },
     canAct() {
-      return this.sum.count && this.selectCoin && this.request !== "pending";
+      return this.count && this.selectCoin && this.request !== "pending";
     },
     hasIn() {
       return this.assets?.some((coin) => coin?.id === this.selectCoin?.id);
@@ -110,7 +124,7 @@ export default {
     changeSelect({ coin }) {
       this.selectCoin = coin;
     },
-    inputSum(count) {
+    /*     inputSum(count) {
       count = Number(
         count
           .replace(this.sum.require, "")
@@ -118,7 +132,7 @@ export default {
           .reduce((acc, el, i) => (acc += i == 1 ? "." + el : el), "")
       );
       this.sum.count = count ? count : 0;
-    },
+    }, */
   },
 };
 </script>

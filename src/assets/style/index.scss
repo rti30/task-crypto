@@ -355,6 +355,22 @@ a:link {
 	opacity: 0;
 }
 
+.top-enter-active,
+.top-leave-active {
+	transition: opacity, transform 0.7s;
+	transform: translate(0, 0);
+	opacity: 0;
+}
+.top-enter-to {
+	opacity: 1;
+	transform: translate(0, -100%);
+}
+.top-enter,
+.top-leave-to {
+	opacity: 0;
+	transform: translate(0, 0);
+}
+
 .anim-page-enter-active {
 	animation: pageIn 0.3s;
 }
@@ -362,6 +378,7 @@ a:link {
 .anim-page-leave-active {
 	animation: pageOut 0.3s;
 }
+
 @keyframes pageIn {
 	from {
 		opacity: 0;
