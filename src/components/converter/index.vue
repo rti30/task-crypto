@@ -71,7 +71,7 @@
             {{ convertData.to.id.toUpperCase() }}
           </span>
           <span class="text">
-            (по курсу: {{ convertData.price }} за ед.)</span>
+            (по курсу: {{ convertData.price.toLocaleString() }} за ед.)</span>
           <transition name="top"><span
               v-if="animCopyResult"
               class="convert-result__message"
