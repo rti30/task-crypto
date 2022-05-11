@@ -54,31 +54,28 @@
             })
           "
         ></CoinSelect>
+        <svg
+          class="convert__remove sprite-icon sprite-icon--remove"
+          v-if="convertData.to||convertData.from||result"
+          @click="clearData"
+        >
+          <use xlink:href="@/assets/img/sprite.svg#icon-remove"></use>
+        </svg>
         <div
           v-if="result"
-          class="convert__result text"
+          class="convert__result convert-result text"
         >
-          <div class="converter__row">
-            <div class="convert-result">
-              <label class="convert__title converter__label">Результат: </label>
-              <span class="text--sp">
-                <span @click="copyResult">{{ result }}</span>
-                {{ convertData.to.id.toUpperCase() }}
-              </span>
-              <span class="text">
-                (по курсу: {{ convertData.price }} за ед.)</span>
-              <transition name="top"><span
-                  v-if="animCopyResult"
-                  class="convert-result__message"
-                >Скопировано!</span></transition>
-            </div>
-            <svg
-              class="sprite-icon sprite-icon--remove"
-              @click="clearData"
-            >
-              <use xlink:href="@/assets/img/sprite.svg#icon-remove"></use>
-            </svg>
-          </div>
+          <p class="convert__title converter__label">Результат: </p>
+          <span class="text--sp">
+            <span @click="copyResult">{{ result }}</span>
+            {{ convertData.to.id.toUpperCase() }}
+          </span>
+          <span class="text">
+            (по курсу: {{ convertData.price }} за ед.)</span>
+          <transition name="top"><span
+              v-if="animCopyResult"
+              class="convert-result__message"
+            >Скопировано!</span></transition>
         </div>
         <p
           class="text"
@@ -202,6 +199,12 @@ export default {
     flex: 1 1 auto;
   }
 }
+.convert {
+  &__remove {
+    justify-self: end;
+  }
+}
+
 .convert-result {
   position: relative;
   &__message {
