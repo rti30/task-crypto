@@ -59,12 +59,8 @@ export default {
           {
             label: `${this.converted.from.toUpperCase()} / ${this.converted.to.toUpperCase()}`,
             data: this.dataTime.values,
-            backgroundColor:
-              "#" +
-              (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6),
-            borderColor:
-              "#" +
-              (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6),
+            backgroundColor: "rgb(193, 200, 228)",
+            borderColor: "rgb(0, 225, 255)",
             pointRadius: this.pointRadius,
           },
         ],
@@ -75,7 +71,7 @@ export default {
         (acc, item) => {
           const [time, value] = item;
           const date = new Date(time);
-          const month = date.getMonth();
+          const month = +date.getMonth() + 1;
           const dataData = date.getDate();
           const hour = date.getHours();
           const minutes = date.getMinutes();
