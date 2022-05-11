@@ -8,7 +8,7 @@ export default {
       convert: {
          from: null,
          to: null,
-         count: 1,
+         count: 1, //! сохраняется в виде строки, для работы с большими дробями/числами
          price: null,
       },
       request: "succsess",
@@ -17,7 +17,7 @@ export default {
       coins: (state) => state.coins,
       convert: (state) => state.convert,
       request: state => state.request,
-      result: ({ convert }) => convert.price ? convert.price * convert.count : null
+      result: ({ convert }) => convert.price ? convert.price * +convert.count : null
    },
    mutations: {
       setCoins(state, data) {
@@ -53,7 +53,7 @@ export default {
          if (item && hasInCoin()) {
             commit("setForConvert", { item, value: coin });
          }
-         if (!isNaN(count)) {
+         if (!isNaN(+count)) {
             commit("setForConvert", { item: "count", value: count });
          }
       },
@@ -64,7 +64,7 @@ export default {
          commit("setPrice", null);
          commit("setRequest", "pending");
          try {
-            if (getters.convert.to && getters.convert.from && !isNaN(getters.convert.count)) {
+            if (getters.convert.to && getters.convert.from && !isNaN(+getters.convert.count)) {
                try {
                   const result = (await convert({
                      coin: [getters.convert.from.name],

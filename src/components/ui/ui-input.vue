@@ -39,14 +39,12 @@ export default {
     isInput(value) {
       if (this.mode === "double") {
         const require = /[^\d/.]/g;
-        value = Number(
-          value
-            .replace(require, "")
-            .split(".")
-            .reduce((acc, el, i) => (acc += i == 1 ? "." + el : el), "")
-        );
+        value = value
+          .replace(require, "")
+          .split(".")
+          .reduce((acc, el, i) => (acc += i == 1 ? "." + el : el), "");
+
         value = value ? value : 0;
-        console.log(value);
         this.$emit(`isInput`, value);
       } else {
         this.$emit(`isInput`, value);

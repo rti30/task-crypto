@@ -67,7 +67,7 @@
         >
           <p class="convert__title converter__label">Результат: </p>
           <span class="text--sp">
-            <span @click="copyResult">{{ result }}</span>
+            <span @click="copyResult">{{resultBigString }}</span>
             {{ convertData.to.id.toUpperCase() }}
           </span>
           <span class="text">
@@ -117,6 +117,9 @@ export default {
       request: "request",
       result: "result",
     }),
+    resultBigString() {
+      return this.result.toFixed(15).replace(/0*$/, "");
+    },
     optionsFrom() {
       return this.convertData.to
         ? this.coins.filter((coin) => coin.id !== this.convertData.to.id)
@@ -140,7 +143,11 @@ export default {
     }),
     selected({ item, coin, count }) {
       this.changeSelect({ item, coin, count });
-      if (this.convertData.to && this.convertData.from) {
+      if (
+        this.convertData.to &&
+        this.convertData.from &&
+        this.convertData.count
+      ) {
         this.convertTo();
         this.getChartData({
           coin: this.convertData.from.name,

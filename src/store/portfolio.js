@@ -2,14 +2,14 @@ import convert from "@/apiCoin/convert";
 export default {
    namespaced: true,
    state: {
-      assets: [],
+      assets: [], // {count} //! сохраняется в виде строки, для работы с большими дробями/числами
       currency: 'usd',
       request: "succsess",
    },
    getters: {
       assets: state => state.assets,
       currency: state => state.currency,
-      total: state => state.assets.reduce((acc, item) => acc += item.price * item.count, 0),
+      total: state => state.assets.reduce((acc, item) => acc += item.price * +item.count, 0),
       request: state => state.request,
    },
    mutations: {
@@ -36,6 +36,7 @@ export default {
       async changeAssets({ getters, commit }, { op, coin, count }) {
          //?(подумать) можно не блокировать, а переделать на промис и пусть выполняются по очереди
          //ToDo (подумать) сделать конструкцию ниже читабельнее
+         count = Number(count);
          if (getters.request === "pending") {
             return
          }
@@ -61,7 +62,8 @@ export default {
                      toCoin: [getters.currency],
                   });
                const findIndex = getters?.assets.findIndex((coin) => coin?.id === id);
-               const oldCount = findIndex !== -1 ? getters.assets[findIndex].count : 0;
+               let oldCount = findIndex !== -1 ? getters.assets[findIndex].count : 0;
+               oldCount = Number(oldCount);
                let newCount = 0;
                if (op === "increase") {
                   newCount = oldCount + count;
@@ -79,10 +81,10 @@ export default {
                      commit("setRequest", "succsess");
                      return;
                   }
-                  commit("changeCoin", { id: findIndex, count: newCount, price });
+                  commit("changeCoin", { id: findIndex, count: newCount.toString(), price });
                }
                else {
-                  const newCoint = { ...coin, count, price }
+                  const newCoint = { ...coin, count: count.toString(), price }
                   commit("addCoin", newCoint);
                }
             }

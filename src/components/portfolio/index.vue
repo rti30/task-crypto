@@ -90,10 +90,6 @@ export default {
     return {
       selectCoin: null,
       count: 1,
-      /*       sum: {
-        count: 1,
-         require: /[^\d/.]/g, 
-      }, */
     };
   },
   computed: {
@@ -124,15 +120,6 @@ export default {
     changeSelect({ coin }) {
       this.selectCoin = coin;
     },
-    /*     inputSum(count) {
-      count = Number(
-        count
-          .replace(this.sum.require, "")
-          .split(".")
-          .reduce((acc, el, i) => (acc += i == 1 ? "." + el : el), "")
-      );
-      this.sum.count = count ? count : 0;
-    }, */
   },
 };
 </script>
