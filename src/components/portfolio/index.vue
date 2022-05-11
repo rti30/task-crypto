@@ -106,8 +106,8 @@ export default {
     totalRound() {
       const hasfraction = this.total.toString().split(".").length > 1;
       return hasfraction
-        ? (Math.floor(this.total * 100000) / 100000).toLocaleString()
-        : this.total.toLocaleString();
+        ? Math.floor(this.total * 100000) / 100000
+        : this.total;
     },
     canAct() {
       return this.count && this.selectCoin && this.request !== "pending";
