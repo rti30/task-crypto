@@ -67,7 +67,7 @@
         >
           <p class="convert__title converter__label">Результат: </p>
           <span class="text--sp">
-            <span @click="copyResult">{{resultBigString }}</span>
+            <span @click="copyResult">{{result }}</span>
             {{ convertData.to.id.toUpperCase() }}
           </span>
           <span class="text">
@@ -117,9 +117,6 @@ export default {
       request: "request",
       result: "result",
     }),
-    resultBigString() {
-      return this.result.toFixed(10).replace(/0*$/, "");
-    },
     optionsFrom() {
       return this.convertData.to
         ? this.coins.filter((coin) => coin.id !== this.convertData.to.id)
