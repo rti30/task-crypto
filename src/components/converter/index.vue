@@ -118,7 +118,7 @@ export default {
       result: "result",
     }),
     resultBigString() {
-      return this.result.toFixed(15).replace(/0*$/, "");
+      return this.result.toFixed(10).replace(/0*$/, "");
     },
     optionsFrom() {
       return this.convertData.to
